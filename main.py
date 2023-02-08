@@ -6,27 +6,36 @@ def main():
 	root = tk.Tk()
 	root.title("stats calculator")
 	root.geometry("1600x900")
+	root.columnconfigure(0, weight=1)
 	root.resizable(False, False)
 	# atk
 	atk_frame = tk.Frame(root)
-	atk_frame.grid(row = 0, pady=(20,10), padx=(80,5), sticky='ew')
+	atk_frame.grid(row = 0, pady=(20,5), padx=(80,5), columnspan=2, sticky='w')
 	atk = Atk(atk_frame, 70)
 	# e_atk
 	e_atk_frame = tk.Frame(root)
-	e_atk_frame.grid(row= 2, pady=20, padx=(80,0), sticky='ew')
+	e_atk_frame.grid(row= 2, pady=(5, 10), padx=(80,0), columnspan=2, sticky='w')
 	e_atk = ElementAtk(e_atk_frame, 17)
 	# crit
 	crit_frame = tk.Frame(root)
-	crit_frame.grid(row=4, pady=20, padx=(80,0), sticky='ew')
+	crit_frame.grid(row=4, pady=20, padx=(80,0), columnspan=2, sticky='w')
 	crit = Crit(crit_frame, 10, 10)
 	# skill
 	skill_frame = tk.Frame(root)
-	skill_frame.grid(row=8, pady=(10, 0), padx=(80,0), sticky='ew')
-	skill = SkillBasic(skill_frame, 0, 'skill %')
+	skill_frame.grid(row=8, pady=(10, 0), padx=(80,0), columnspan=2, sticky='w')
+	skill = SkillBasicEle(skill_frame, 0, 'skill %')
 	# basic
 	basic_frame = tk.Frame(root)
-	basic_frame.grid(row=9, pady=(0,10), padx=(80, 0), sticky='ew')
-	basic = SkillBasic(basic_frame, 0, 'basic ATK %')
+	basic_frame.grid(row=9, padx=(80, 0), columnspan=2, sticky='w')
+	basic = SkillBasicEle(basic_frame, 0, 'basic ATK %')
+	# ele DMG %
+	e_DMG_per_frame = tk.Frame(root)
+	e_DMG_per_frame.grid(row=10, pady=(0, 10), padx=(80, 0), columnspan=2, sticky='w')
+	basic = SkillBasicEle(e_DMG_per_frame, 0, 'Ele DMG %')
+	# di
+	di_frame = tk.Frame(root)
+	di_frame.grid(row=11, pady=20, padx=(80, 0), columnspan=2, sticky='w')
+	di = DefIgn(di_frame, 100)
 
 
 	root.mainloop()
@@ -99,7 +108,7 @@ class Atk:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w')
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self):
@@ -132,25 +141,14 @@ class ElementAtk:
 		self.progress = ttk.Progressbar(self.root, orient="horizontal", length=250, mode="determinate")
 		self.progress.grid(row=self.stats_row, column=4, padx= (200,20))
 
-		# row 2
-		# bonus e.atk
-		self.bonus_atk = tk.Label(self.root, text='E-ATK bonus:', anchor='w', width=15)
-		self.bonus_atk.grid(row=self.stats_row + 1, column=0)
-
-		self.bonus_atk_entry = tk.Entry(self.root)
-		self.bonus_atk_entry.insert(0, "0")
-		self.bonus_atk_entry.grid(row=self.stats_row + 1, column=1, padx=(0, 120))
-
 		self.base_atk_entry.bind("<Return>", lambda e: self.set_progress())
 		self.stat_increase_entry.bind("<Return>", lambda e: self.set_progress())
-		self.bonus_atk_entry.bind("<Return>", lambda e : self.set_progress())
 
 	def calc_DPS_increase(self, increase: float = 0) -> float:
 		# get value
 		base = float(self.base_atk_entry.get())
-		bonus = float(self.bonus_atk_entry.get())
 		# calculate increase
-		DPS_multiplier = (1 + (base + increase + bonus) / 700)
+		DPS_multiplier = (1 + (base + increase) / 700)
 		return DPS_multiplier
 
 	def calc_increase(self)  -> float:
@@ -164,7 +162,7 @@ class ElementAtk:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w')
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self):
@@ -269,7 +267,7 @@ class Crit:
 	def calc_increase_mod(self)  -> float:
 		stat = self.calc_DPS_increase()
 		stat_increase = self.calc_DPS_increase(increase_mod= float(self.stat_increase_mod_entry.get()))
-		increase = (stat_increase - stat) / (stat - 1) * 100
+		increase = (stat_increase - stat) / (stat - 1) * 100 # todo: this equation doesn't work'
 		return increase
 
 	def calc_increase_DMG(self)  -> float:
@@ -284,10 +282,10 @@ class Crit:
 		self.progress_mod.config(maximum=10)
 		self.progress_mod.config(value=increase)
 
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w')
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
 		label3.grid(row=self.stats_row, column=5)
 
-		label5 = tk.Label(self.root, text=f"{crit_rate * 100:.2f}% CRIT rate", anchor='w')
+		label5 = tk.Label(self.root, text=f"{crit_rate * 100:.2f}% CRIT rate", anchor='w', width=20)
 		label5.grid(row=self.stats_row + 1, column=4, padx=(200, 20))
 
 	def set_progress_DMG(self):
@@ -295,7 +293,7 @@ class Crit:
 		self.progress_DMG.config(maximum=10)
 		self.progress_DMG.config(value=increase)
 
-		label4 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w')
+		label4 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
 		label4.grid(row=self.stats_row + 2, column=5)
 
 
@@ -321,7 +319,7 @@ class Crit:
 		crit_rate = crit_rate if crit_rate <= 1 else 1
 		return crit_rate
 
-class SkillBasic:
+class SkillBasicEle:
 	def __init__(self, root, stat_increase: int, stat_name: str, stats_row: int = 0) -> None:
 		self.stat_increase = stat_increase
 		self.root = root
@@ -369,11 +367,114 @@ class SkillBasic:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w')
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self):
 		return self.calc_DPS_increase()
+
+class DefIgn:
+	def __init__(self, root, stat_increase: int, stats_row: int = 0) -> None:
+		self.stat_increase = stat_increase
+		self.root = root
+		self.stats_row = stats_row
+
+		# row 1
+		# Def Ignore
+		self.label = tk.Label(self.root, text=f"DEF Ignore:", anchor='w', width=15)
+		self.label.grid(row=self.stats_row, column=0)
+
+		self.def_ignore_entry = tk.Entry(self.root)
+		self.def_ignore_entry.insert(5000, '5000')
+		self.def_ignore_entry.grid(row=self.stats_row, column=1, padx= (0, 120))
+
+		# increase
+		self.label1 = tk.Label(self.root, text=f"+ DEF Ignore:", anchor='w', width=20)
+		self.label1.grid(row=self.stats_row, column=2)
+
+		self.stat_increase_entry = tk.Entry(self.root)
+		self.stat_increase_entry.insert(stat_increase, str(stat_increase))
+		self.stat_increase_entry.grid(row=self.stats_row, column=3, sticky='w')
+
+		#progress_mod
+		self.progress = ttk.Progressbar(self.root, orient="horizontal", length=250, mode="determinate")
+		self.progress.grid(row=self.stats_row , column=4, padx= (200,20))
+
+		# row 2
+		# enemy Def
+		self.label2 = tk.Label(self.root, text= 'enemy DEF:', anchor='w', width=15)
+		self.label2.grid(row=self.stats_row + 1, column = 0)
+
+		self.def_entry = tk.Entry(self.root)
+		self.def_entry.insert(6800, "6800")
+		self.def_entry.grid(row=self.stats_row + 1, column=1, padx=(0, 120))
+
+		# Def shred
+		self.label3 = tk.Label(self.root, text='DEF shred:', anchor='w', width=20)
+		self.label3.grid(row=self.stats_row + 1, column=2)
+
+		self.def_shred_entry = tk.Entry(self.root)
+		self.def_shred_entry.insert(0, "0")
+		self.def_shred_entry.grid(row=self.stats_row + 1, column=3, sticky='w')
+
+		# row 3
+		# Def shred %
+		self.label4 = tk.Label(self.root, text='DEF shred %:', anchor='w', width=15)
+		self.label4.grid(row=self.stats_row + 2, column=0)
+
+		self.def_shred_per_entry = tk.Entry(self.root)
+		self.def_shred_per_entry.insert(0, "0")
+		self.def_shred_per_entry.grid(row=self.stats_row + 2, column=1, padx=(0, 120))
+
+
+		# triggers
+		self.def_shred_entry.bind("<Return>", lambda e: self.set_progress())
+		self.def_entry.bind("<Return>", lambda e : self.set_progress())
+		self.def_shred_per_entry.bind("<Return>", lambda e : self.set_progress())
+		self.stat_increase_entry.bind("<Return>", lambda e : self.set_progress())
+		self.def_ignore_entry.bind("<Return>", lambda e : self.set_progress())
+
+	def calc_DPS_increase(self, increase: float = 0) -> float:
+		# get value
+		di = float(self.def_ignore_entry.get()) + increase
+		defense = self.calc_def()
+		delta = defense - di
+
+		if delta <= 0:
+			DPS_multiplier = 1
+		else:
+			DPS_multiplier = 1505 / (1505 + delta)
+
+		return DPS_multiplier
+
+	def calc_increase(self)  -> float:
+		stat = self.calc_DPS_increase()
+		stat_increase = self.calc_DPS_increase(float(self.stat_increase_entry.get()))
+		increase = (stat_increase - stat) * 100
+		return increase
+
+	def set_progress(self):
+		increase = self.calc_increase()
+		self.progress.config(maximum=10)
+		self.progress.config(value=increase)
+		label = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label.grid(row=self.stats_row, column=5)
+
+	def calc_def(self) -> float:
+		# get value
+		base = float(self.def_entry.get())
+		per_shred = float(self.def_shred_per_entry.get()) / 100
+		flat_shred = float(self.def_shred_entry.get())
+
+		defense = base * (1 - per_shred) - flat_shred
+		return defense
+
+	def get(self):
+		return self.calc_DPS_increase()
+
+#todo: ep
+
+
 
 if __name__ == '__main__':
 	main()
