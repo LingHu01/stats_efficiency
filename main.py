@@ -8,55 +8,63 @@ def main():
 	root.geometry("1600x900")
 	root.columnconfigure(0, weight=1)
 	root.resizable(False, False)
+	root.configure(background= '#2b2b2b')
+
+	#style
+	style = ttk.Style()
+	style.theme_use('clam')
+	style.configure('dark_frame', background= '#2b2b2b')
+	style.layout('dark_frame', [('dark_frame', {'sticky': 'nswe'})])
+	style.configure('TProgressbar', foreground='#2b2b2b', background='#4b74a4')
 
 	# atk
-	atk_frame = tk.Frame(root)
+	atk_frame = ttk.Frame(root, style = 'dark_frame')
 	atk_frame.grid(row = 0, pady=(20,5), padx=(80,5), columnspan=2, sticky='w')
 	atk = Atk(atk_frame, 70)
 
 	# e_atk
-	e_atk_frame = tk.Frame(root)
+	e_atk_frame = ttk.Frame(root, style = 'dark_frame')
 	e_atk_frame.grid(row= 2, pady=(5, 10), padx=(80,0), columnspan=2, sticky='w')
 	e_atk = ElementAtk(e_atk_frame, 17)
 
 	# crit
-	crit_frame = tk.Frame(root)
+	crit_frame = ttk.Frame(root, style = 'dark_frame')
 	crit_frame.grid(row=4, pady=20, padx=(80,0), columnspan=2, sticky='w')
 	crit = Crit(crit_frame, 10, 10)
 
 	# di
-	ep_frame = tk.Frame(root)
+	ep_frame = ttk.Frame(root, style = 'dark_frame')
 	ep_frame.grid(row=8, pady=20, padx=(80, 0), columnspan=2, sticky='w')
 	di = DefIgn(ep_frame, 100)
 
 	# ep
-	ep_frame = tk.Frame(root)
+	ep_frame = ttk.Frame(root, style = 'dark_frame')
 	ep_frame.grid(row=11, pady=20, padx=(80, 0), columnspan=2, sticky='w')
 	di = Ep(ep_frame, 100)
 
 	# skill
-	skill_frame = tk.Frame(root)
+	skill_frame = ttk.Frame(root, style = 'dark_frame')
 	skill_frame.grid(row=13, pady=(10, 0), padx=(80,0), columnspan=2, sticky='w')
 	skill = BinaryStats(skill_frame, 0, 0, 'skill %')
 
 	# basic
-	basic_frame = tk.Frame(root)
+	basic_frame = ttk.Frame(root, style = 'dark_frame')
 	basic_frame.grid(row=14, padx=(80, 0), columnspan=2, sticky='w')
 	basic = BinaryStats(basic_frame, 0, 0, 'basic ATK %')
 
 	# Boss DMG
-	boss_DMG_frame = tk.Frame(root)
+	boss_DMG_frame = ttk.Frame(root, style = 'dark_frame')
 	boss_DMG_frame.grid(row=15, padx=(80, 0), columnspan=2, sticky='w')
 	boss_DMG = BinaryStats(boss_DMG_frame, 50, 0, 'Boss DMG %')
 
 	# DMG bonus
-	bonus_DMG_frame = tk.Frame(root)
+	bonus_DMG_frame = ttk.Frame(root, style = 'dark_frame')
 	bonus_DMG_frame.grid(row=16, padx=(80, 0), columnspan=2, sticky='w')
 	bonus_DMG = BinaryStats(bonus_DMG_frame, 100, 0, 'DMG bonus %')
 
 
 	# ele DMG %
-	e_DMG_per_frame = tk.Frame(root)
+	e_DMG_per_frame = ttk.Frame(root, style = 'dark_frame')
 	e_DMG_per_frame.grid(row=17, pady=(0, 10), padx=(80, 0), columnspan=2, sticky='w')
 	e_DMG = BinaryStats(e_DMG_per_frame, 100, 0, 'Ele DMG %')
 
@@ -84,10 +92,12 @@ class Atk:
 
 		# row 2
 		# bonus atk %
-		self.bonus_atk_percent = LabelEntry(self.root, 1, 0, 'ATK bonus %', 0, lambda e : self.set_progress(), padx= (0, 120))
+		self.bonus_atk_percent = LabelEntry(self.root, 1, 0, 'ATK bonus %', 0, lambda e : self.set_progress(), padx= (0, 120),
+											tooltip='% atk from gear, card, etc.')
 
 		# bonus atk
-		self.bonus_atk = LabelEntry(self.root, 1, 2, 'ATK bonus', 0, lambda e : self.set_progress())
+		self.bonus_atk = LabelEntry(self.root, 1, 2, 'ATK bonus', 0, lambda e : self.set_progress(),
+									tooltip='flat atk from other source (skill, pet, etc.)')
 
 	def calc_DPS_increase(self, increase: float = 0) -> float:
 		# get value
@@ -108,7 +118,7 @@ class Atk:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self) -> float:
@@ -122,10 +132,10 @@ class ElementAtk:
 
 		# row 1
 		# base e.atk
-		self.base_atk = LabelEntry(self.root, 0, 0, 'base E-ATK', 250, lambda e : self.set_progress(), padx=(0, 120))
+		self.base_atk = LabelEntry(self.root, 0, 0, 'E-ATK', 250, lambda e : self.set_progress(), padx=(0, 120))
 
 		# increase
-		self.increase = LabelEntry(self.root, 0, 2, '+ E-ATK', 250, lambda e : self.set_progress())
+		self.increase = LabelEntry(self.root, 0, 2, '+ E-ATK', 17, lambda e : self.set_progress())
 
 		# progress_mod bar
 		self.progress = ttk.Progressbar(self.root, orient="horizontal", length=250, mode="determinate")
@@ -150,7 +160,7 @@ class ElementAtk:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self):
@@ -177,7 +187,8 @@ class Crit:
 		self.bonus_crit_rate = LabelEntry(self.root, 1, 0, 'bonus CRIT rate', 0, lambda e : self.set_progress(), padx=(0, 120))
 
 		# CRIT resist
-		self.crit_resist = LabelEntry(self.root, 1, 2, 'CRIT resist %', 0, lambda e : self.set_progress())
+		self.crit_resist = LabelEntry(self.root, 1, 2, 'CRIT resist %', 0, lambda e : self.set_progress(),
+									  tooltip= 'enemy CRIT rate resistance')
 
 		#row 3
 		# CRIT DMG
@@ -237,10 +248,10 @@ class Crit:
 		self.progress_mod.config(maximum=10)
 		self.progress_mod.config(value=increase)
 
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label3.grid(row=self.stats_row, column=5)
 
-		label5 = tk.Label(self.root, text=f"{crit_rate * 100:.2f}% CRIT rate", anchor='w', width=20)
+		label5 = tk.Label(self.root, text=f"{crit_rate * 100:.2f}% CRIT rate", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label5.grid(row=self.stats_row + 1, column=4, padx=(200, 20))
 
 	def set_progress_DMG(self):
@@ -248,7 +259,7 @@ class Crit:
 		self.progress_DMG.config(maximum=10)
 		self.progress_DMG.config(value=increase)
 
-		label4 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label4 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label4.grid(row=self.stats_row + 2, column=5)
 
 	def set_progress(self):
@@ -306,7 +317,7 @@ class BinaryStats:
 		increase = self.calc_increase()
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label3 = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label3.grid(row=self.stats_row, column=5)
 
 	def get(self):
@@ -333,11 +344,13 @@ class DefIgn:
 		self.defense = LabelEntry(self.root, 1, 0, 'enemy DEF', 6800, lambda e : self.set_progress(), padx= (0, 120))
 
 		# Def shred
-		self.def_shred = LabelEntry(self.root, 1, 2, 'DEF shred', 0, lambda e : self.set_progress())
+		self.def_shred = LabelEntry(self.root, 1, 2, 'DEF shred', 0, lambda e : self.set_progress(),
+									tooltip= 'def shred (soul ord, skill, etc.')
 
 		# row 3
 		# Def shred %
-		self.def_shred_per = LabelEntry(self.root, 2, 0, 'DEF shred %', 0, lambda e : self.set_progress(), padx=(0, 120))
+		self.def_shred_per = LabelEntry(self.root, 2, 0, 'DEF shred %', 0, lambda e : self.set_progress(), padx=(0, 120),
+										tooltip= '% def shred (ninja talent)')
 
 	def calc_DPS_increase(self, increase: float = 0) -> float:
 		# get value
@@ -363,10 +376,10 @@ class DefIgn:
 		damage_lost = (1 - self.calc_DPS_increase()) * 100
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label.grid(row=self.stats_row, column=5)
 
-		label2 = tk.Label(self.root, text=f"losing {damage_lost:.2f}% DPS to DI", anchor='w', width=20)
+		label2 = tk.Label(self.root, text=f"losing {damage_lost:.2f}% DPS to DI", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label2.grid(row=self.stats_row + 1, column=4, padx=(200, 20))
 
 	def calc_def(self) -> float:
@@ -427,14 +440,14 @@ class Ep:
 		damage_lost = (1 - self.calc_DPS_increase()) * 100
 		self.progress.config(maximum=10)
 		self.progress.config(value=increase)
-		label = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20)
+		label = tk.Label(self.root, text=f" +{increase:.2f}% DPS", anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label.grid(row=self.stats_row, column=5)
 
 		if damage_lost > 0:
 			text = f"losing {damage_lost:.2f}% DPS to EP"
 		else:
 			text = "no losing DPS to EP"
-		label2 = tk.Label(self.root, text=text, anchor='w', width=20)
+		label2 = tk.Label(self.root, text=text, anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		label2.grid(row=self.stats_row + 1, column=4, padx=(200, 20))
 
 	def calc_def(self) -> float:
@@ -462,10 +475,10 @@ class LabelEntry:
 		self.tooltip_text = tooltip
 		self.tooltip = None
 
-		self.label = tk.Label(self.root, text=text, anchor='w', width=20)
+		self.label = tk.Label(self.root, text=text, anchor='w', width=20, background= '#2b2b2b', foreground= '#a2aaa4')
 		self.label.grid(row=row, column= column)
 
-		self.entry = tk.Entry(root)
+		self.entry = tk.Entry(self.root, background= '#323232', foreground= '#a2aaa4', insertbackground="#a2aaa4")
 		self.entry.insert(startingvalue, str(startingvalue))
 		self.entry.grid(row=row, column= column + 1, sticky='w', padx= padx)
 
@@ -482,7 +495,7 @@ class LabelEntry:
 		self.tooltip.geometry(f"+{x}+{y + 20}")
 		self.tooltip.overrideredirect(True)
 
-		label = tk.Label(self.tooltip, text=self.tooltip_text, bg="yellow")
+		label = tk.Label(self.tooltip, text=self.tooltip_text, background= '#a2aaa4', foreground= '#2b2b2b')
 		label.pack(ipadx=1, ipady=1)
 
 	def hide_tooltip(self, event) :
@@ -493,7 +506,6 @@ class LabelEntry:
 	def get(self):
 		value = float(self.entry.get())
 		return value
-
 
 if __name__ == '__main__':
 	main()
